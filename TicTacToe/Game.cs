@@ -17,7 +17,7 @@
         WinX,
         WinO,
     }
-    
+
     public enum Field
     {
         Empty,
@@ -27,10 +27,10 @@
 
     internal class Game : IGame
     {
-        private static readonly (int, int, int)[] WinCombination = new (int, int, int)[] { (0,1,2), (3, 4, 5), (6,7,8 ), (0,3,6), (1,4,7 ), (2,5,8), (0,4,8), (2,4,6) };
+        private static readonly (int, int, int)[] WinCombination = new (int, int, int)[] { (0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6) };
 
         private Field[] Fields = new Field[9];
-
+        private Field WhoStarted;
         private int PlayedRound
         {
             get
@@ -47,9 +47,10 @@
 
         public GameState State { get; set; }
 
-        public Game() 
+        public Game()
         {
             this.State = GameState.PlayX;
+            this.WhoStarted = Field.X;
         }
 
         public void Reset()
@@ -58,7 +59,15 @@
             {
                 Fields[i] = Field.Empty;
             }
-            State = GameState.PlayO;
+            switch (WhoStarted)
+            {
+                case Field.X:
+                    State = GameState.PlayX;
+                    break;
+                case Field.O:
+                    State = GameState.PlayO;
+                    break;
+            }
         }
 
         public void Move(int pos)
@@ -68,7 +77,7 @@
             setFieldMove(pos);
             if (IsWinner())
                 SetWinner();
-            else if (Fields.Length == PlayedRound) 
+            else if (Fields.Length == PlayedRound)
             {
                 State = GameState.Draw;
             }
@@ -87,11 +96,10 @@
             }
         }
 
-
         private void setFieldMove(int pos)
         {
             if (Fields[pos] != Field.Empty)
-                throw new FieldAlreadyTakenException($"field on pos X-{pos % 3} Y-{(int)(pos / 3)}");
+                throw new FieldAlreadyTakenException($"field on pos X-{pos % 3} Y-{(int)(pos / 3)} already taken.");
             switch (State)
             {
                 case GameState.PlayX:
