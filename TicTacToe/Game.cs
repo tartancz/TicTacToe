@@ -75,7 +75,7 @@
             if (IsGameOver())
                 throw new GameIsOverException("Game is over, you cant make move");
             setFieldMove(pos);
-            if (IsWinner())
+            if (IsWinner(pos))
                 SetWinner();
             else if (Fields.Length == PlayedRound)
             {
@@ -125,22 +125,22 @@
                 default: return;
             }
         }
-        private bool IsWinner()
+        private bool IsWinner(int pos)
         {
-            foreach (var combi in Game.WinCombination)
+            var PossibleWinCombination =
+            from combi
+            in Game.WinCombination
+            where combi.Item1 == pos || combi.Item2 == pos || combi.Item3 == pos
+            select combi;
+            foreach (var combi in PossibleWinCombination)
             {
-                bool IsRowCompleted =
-                    Fields[combi.Item1] == Fields[combi.Item2]
-                    && Fields[combi.Item2] == Fields[combi.Item3]
-                    && Fields[combi.Item1] != Field.Empty
-                    && Fields[combi.Item2] != Field.Empty
-                    && Fields[combi.Item3] != Field.Empty;
-                if (IsRowCompleted)
+                if (Fields[combi.Item1] == Field.Empty || Fields[combi.Item2] == Field.Empty || Fields[combi.Item3] == Field.Empty)
+                    continue;
+                if (Fields[combi.Item1] == Fields[combi.Item2] && Fields[combi.Item2] == Fields[combi.Item3])
                     return true;
             }
             return false;
         }
-
 
         public bool IsGameOver()
         {
